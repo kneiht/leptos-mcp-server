@@ -43,6 +43,8 @@ impl LeptosTools {
     pub fn leptos_autofixer(&self, code: &str) -> String {
         let mut suggestions = Vec::new();
 
+        // TODO: Add more checks
+        
         // Check for common issues
 
         // 1. Check for direct .get() in view without move ||
@@ -60,36 +62,22 @@ impl LeptosTools {
             );
         }
 
-        // 3. Check for println! instead of tracing
-        if code.contains("println!") {
-            suggestions.push(
-                "WARNING: Use tracing macros (tracing::info!, tracing::debug!) instead of println!",
-            );
-        }
-
-        // 4. Check for missing #[component] macro
+        // 3. Check for missing #[component] macro
         if code.contains("-> impl IntoView") && !code.contains("#[component]") {
             suggestions.push(
                 "ERROR: Functions returning `impl IntoView` should have #[component] attribute",
             );
         }
 
-        // 5. Check for server function without proper error handling
+        // 4. Check for server function without proper error handling
         if code.contains("#[server") && !code.contains("ServerFnError") {
             suggestions.push("INFO: Server functions should return Result<T, ServerFnError>");
         }
 
-        // 6. Check for deprecated create_signal
+        // 5. Check for deprecated create_signal
         if code.contains("create_signal") {
             suggestions.push(
                 "INFO: In Leptos 0.8+, use `signal()` instead of `create_signal()`",
-            );
-        }
-
-        // 7. Check for value= instead of prop:value=
-        if code.contains("value=") && !code.contains("prop:value=") && code.contains("<input") {
-            suggestions.push(
-                "WARNING: For controlled inputs, use `prop:value=` instead of `value=`",
             );
         }
 
